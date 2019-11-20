@@ -10,6 +10,9 @@
 	
 	defined( '_JEXEC' ) or die;
 	defined( 'DS' ) or define( 'DS' , DIRECTORY_SEPARATOR );
+	
+	
+	
 	require_once dirname( __FILE__ ) . '/core/helper.php';
 	$layout            = $params->get( 'layout' , 'default' );
 	$Search_helper     = new VmSearchProHelper( $params , $module );
@@ -20,11 +23,17 @@
 		$search_module_id = (int) JRequest::getVar( 'search_module_id' );
 		if( $search_module_id == $module->id )
 		{
+			
 			$search_category_id = JRequest::getVar( 'search_category_id' );
 			$search_name        = urldecode( JRequest::getVar( 'search_name' ) );
 			$Search_helper->_autocomplete( $search_category_id , $search_name , $params );
+			
+			
+			
 			$category_id = vRequest::getInt( 'virtuemart_category_id' , 0 );
 			$search_name = urldecode( vRequest::getVar( 'keyword' , '' ) );
+			
+			
 		}
 		
 	}

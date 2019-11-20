@@ -35,18 +35,33 @@ class VmSearchProHelper extends SjVmSearchProBaseHelper
 		$source_group = null;
 		$catids = ($search_category_id == 0 ? 0 : $search_category_id);
 		
-		$query = ' * , pp.product_price FROM `#__virtuemart_products_'.VmConfig::$vmlang.'` p LEFT JOIN #__virtuemart_product_prices pp ON p.virtuemart_product_id = pp.virtuemart_product_id';
+		$query = ' * , pp.product_price FROM `#__virtuemart_products_'.VmConfig::$vmlang
+			.'` p LEFT JOIN #__virtuemart_product_prices pp ON p.virtuemart_product_id = pp.virtuemart_product_id';
+		
+		
+		$query .= " LEFT JOIN ouvog_virtuemart_products ps ON p.virtuemart_product_id = ps.virtuemart_product_id ";
 		
 		if($search_category_id != 0)
 		{
 			$query .= " LEFT JOIN `#__virtuemart_product_categories` pc ON (p.virtuemart_product_id = pc.virtuemart_product_id) WHERE pc.virtuemart_category_id = ".$search_category_id." AND p.product_name LIKE '%".$search_name."%'";
 		}else{
 			$query .= " WHERE p.product_name LIKE '%".$search_name."%'";
+			
 		}
+		 $query .= " AND ps.published =  1 ";
+		
+		// $select = '`p`.`published` ' ;
+		
+		
 		//$source_group = null;
 		$productModel = VmModel::getModel('Product');
 		//$productModel = new VirtuemartModelProductExtend();
-		$items = $productModel->exeSortSearchListQuery (0,$query,'','','','','',$limitation);
+		$items = $productModel->exeSortSearchListQuery (0,$query, '' ,'','','','',$limitation);
+		
+		
+		/*echo'<pre>';print_r( $items );echo'</pre>'.__FILE__.' '.__LINE__;
+		die(__FILE__ .' '. __LINE__ );*/
+		
 		if($limitation == 0){
 			$productModel->_noLimit = true;
 		}
@@ -67,11 +82,16 @@ class VmSearchProHelper extends SjVmSearchProBaseHelper
 			'background' => $params->get('imgcfg_background')
 		);
 		
+		
+		
 		foreach($items as $item){
 			
 			$virtuemart_product_id = $item->virtuemart_product_id;
 			$quantity = 1;
 			$product_info = $productModel->getProduct($virtuemart_product_id,TRUE,TRUE,TRUE,$quantity);
+			
+			
+			
 			$productModel->addImages($product_info);
 			$currency = CurrencyDisplay::getInstance();
 			$salesPrice = $currency->createPriceDiv('salesPrice', "Price: ", $product_info->allPrices[0], false, false, 1.0, true);
